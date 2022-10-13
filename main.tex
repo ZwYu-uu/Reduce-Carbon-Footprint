@@ -1,0 +1,268 @@
+\documentclass[conference, 10pt, ﬁnal, letterpaper, twocolumn]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage{stmaryrd}
+\usepackage{amsfonts}
+\usepackage{mathrsfs,amsmath}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{mhchem}
+\usepackage{multirow}
+\usepackage{algorithmic} 
+\usepackage{bm}
+\usepackage{setspace}
+\usepackage{amsthm}
+\usepackage{empheq}
+\usepackage{booktabs}
+\usepackage{authblk}
+\usepackage[ruled,linesnumbered,vlined]{algorithm2e}  
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage[left=0.65in, right=0.65in, top=0.7in, bottom = 0.98in]{geometry}
+\usepackage{tabularx,booktabs}
+\usepackage{ifpdf}
+ \ifpdf
+ \else
+ \fi
+\usepackage{cite}
+\ifCLASSINFOpdf
+   \usepackage[pdftex]{graphicx}
+\else
+\fi
+\usepackage{amsmath}
+\usepackage[percent]{overpic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+\usepackage{array} 
+\usepackage{tikz,pgfplots,filecontents}
+\usepackage{pgfplots}
+\usepackage{rotating}
+\usetikzlibrary{spy} %
+\pgfplotsset{width=8.6cm, height=6.5cm, compat=1.9}
+ 
+\ifCLASSOPTIONcompsoc 
+  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+  \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
+ 
+\usepackage{url}
+\usepackage{hyperref}
+
+\makeatletter
+\let\NAT@parse\undefined
+\makeatother
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+ \newtheorem{remark}[theorem]{Remark}
+\newtheorem*{pf}{Proof}
+ 
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+\hyphenation{}
+\IEEEoverridecommandlockouts   
+\renewcommand\thepage{}
+\allowdisplaybreaks
+
+\pagenumbering{arabic}
+
+\pgfplotsset{every axis legend/.style={%
+cells={anchor=west},
+inner xsep=3pt,inner ysep=2pt,nodes={inner sep=0.8pt,text depth=0.15em},
+anchor=north east,%
+shape=rectangle,%
+fill=white,%
+draw=black,
+at={(0.98,0.98)},
+font=\footnotesize,
+%line width=1pt,
+%tick style={line width=0.8pt}
+}}
+
+\pgfplotsset{every axis/.append style={line width=0.6pt,tick style={line width=0.8pt}}}
+%\setlength{\abovecaptionskip}{-0pt} 
+
+%---------------------------------------------------------------------------------------------------
+
+
+\begin{document}
+
+\title{Reducing Carbon Footprint in Edge Computing}
+ 
+\author{Zhanwei Yu\textsuperscript{1}, Yi Zhao\textsuperscript{1}, Tao Deng\textsuperscript{2}, Lei You\textsuperscript{3}, and Di Yuan\textsuperscript{1}}
+\affil{\textsuperscript{1}Department of Information Technology, Uppsala University, Sweden
+\authorcr \textsuperscript{2}School of Computer Science and Technology, Soochow University, China
+\authorcr {\em \textsuperscript{1}\{zhanwei.yu; yi.zhao; di.yuan\}@it.uu.se, \textsuperscript{2}dengtao@suda.edu.cn}}
+
+% \author{Zhanwei Yu and Di Yuan}
+% \affil{Department of Information Technology, Uppsala University, Sweden
+% \authorcr {\em \{zhanwei.yu; di.yuan\}@it.uu.se}}
+
+\renewcommand*{\Affilfont}{\small}
+
+\maketitle
+
+\begin{abstract}
+Global warming, caused by the massive amount of carbon emission in the atmosphere, has been happening since the start of the Industrial Revolution and is leading to environmental changes worldwide. In this paper, we first analyze the carbon emissions in edge computing networks. We next analyze real-world data of the varying carbon intensity of electricity to demonstrate the possibility of reducing carbon emissions by leveraging the flexibility to schedule operations of various. We consider scheduling battery charging and task offloading to reduce the total carbon footprint in edge computing networks. We provide a method based on network flow that can visualize this carbon footprint minimization problem as a min cost flow problem which can be solved to the optimum in polynomial time. Numerical results using real-world data show a significant carbon footprint reduction compared with the two benchmark schemes.
+\end{abstract}
+
+\begin{IEEEkeywords}
+carbon emission, scheduling, edge computing.
+\end{IEEEkeywords}
+
+
+\section{Introduction}
+The thread of climate change due to anthropogenic carbon emissions has already been raised by Intergovernmental Panel on Climate Change 30 years ago and generates concern around the globe. To tackle environmental challenges, the European Commission approved the European Green Deal in 2020, which is a set of policy initiatives including measures on energy efficiency and circular economy performance of the information and communications technology (ICT) industry. With recent decades of continuous technical evolution, the carbon emissions of the ICT industry have increased steadily. The authors of \cite{https://doi.org/10.48550/arxiv.2102.02622} reveal that the current ICT's share of emissions could be as high as $2.1\%$ to $3.9\%$, which is more than $2\%$ that the baseline estimates for policy making in Europe. 
+
+There are some efforts to reduce the ICT's footprint. The authors of \cite{cordella2021reducing} assess the carbon footprint (CF) of smartphones and whole-life cost in different materials efficiency strategies, and the results of the analysis help strategies decision makers to reduce the CF of the smartphone. In \cite{Han2013on}, the authors propose and analyze an energy-aware inter-cell collaborative strategy for mobile networks, which offloads traffic from on-grid cells to cells equipped with renewable energy such that carbon emissions can be reduced. Furthermore, basic design principles and challenges in optimizing the green energy enabled mobile networks are discussed in \cite{Han2014Powering}. Energy harvesting technology is introduced into mobile networks to reduce the CF in \cite{Kwasinski2015Increasing}, thereby increasing sustainability and resiliency. In addition, the authors of \cite{perrons2021digital} list four measures that are the potential to significantly help reduce the CF of the ICT industry, one of which is edge computing.
+
+There are some works on green communications in edge computing, namely on low energy consumption. The authors of \cite{Deng2019Parallel} propose a green and sustainable edge computing framework based on energy harvesting technology, and they design an algorithm to minimize the response time and packet losses under the constraint of energy. In \cite{Li2018Green}, edge computing is introduced into virtualized cellular networks with machine-to-machine communications to optimize computing resource allocation and reduce energy consumption. The authors of \cite{Cheng2020Distributed} consider jointly offloading, time slice, and power allocation to minimize the virtualized small cellular networks integrated with edge computing. 
+
+Although low energy consumption might imply the low carbon emissions, we need to explicitly analyze the CF in edge computing. We will show that the energy efficiency is not in fact equivalent to the low CF somehow in Section \ref{subsec:CFA}. Only few studies have addressed CF in edge computing networks. The authors of \cite{van2012distributed} provide a model that can estimate the CF in distributed data center. Their results shows CF reductions are possible via distributed structure. In \cite{do2015proximal}, the authors consider to minimize the CF for video streaming in fog computing networks that has similar distributed structure as that of edge computing networks. Different from \cite{do2015proximal}, we acknowledge the dynamics of carbon intensity in space and time, so we consider scheduling the batteries charging and the tasks offloading to minimize the total CF in edge computing networks. The main contributions of this work are summarized as follows.
+\begin{itemize}
+    \item We investigate the structure of edge computing network, and analyze the carbon emissions in different parts of the networks. We demonstrate the possibility of reducing carbon emissions by leveraging the flexibility to schedule operations of various via analyzing real-world data of the varying carbon intensity of electricity.
+    \item We consider a total CF minimization problem via scheduling battery charging and task offloading. Then we provide a method based on network flow that can visualize this problem as a min cost flow problem that can be solved to the optimum by existing algorithms. 
+    \item We use the real-world date to evaluate the performance. Compared with the two benchmark schemes, the numerical results show a significant CF reduction. In addition, the results also show that our method can help reduce the total cost as well.
+\end{itemize}
+
+\section{System Model}
+
+\input{fig-system_model}
+
+\begin{table*}[h]
+    \caption{\label{tab:notation}List of important notations with respect to CF}
+    \begin{center}
+        \begin{tabular}{*{2}{c}}
+            \toprule
+            \midrule
+            {\bf Notations} & {\bf Description} \\
+            \midrule
+            $I_{st}$ & Carbon intensity of local grid $s$ in time slot $t$ \\
+            \midrule
+            $R_{st}$ & Amount of renewable energy from source $s$ in time slot $t$ \\
+            \midrule
+            $\alpha_{{s}\hat{s}}$ & Required energy for each task transmission from server ${s}$ to $\hat{s}$ \\
+            \midrule
+            $\alpha_{{s}\hat{s}}I_{{s}t}$ & CF of each task offloaded from associated server ${s}$ to $\hat{s}$ in time slot $t$ \\
+            \midrule
+            $\beta_{{s}\hat{s}}$ & Loss per unit of energy from battery ${s}$ to server $\hat{s}$ \\
+            \midrule
+            $\beta_{{s}\hat{s}}I_{\hat{s}t}$ & Equivalent CF per unit of energy from battery ${s}$ to server $\hat{s}$ in time slot $t$\\
+            \midrule
+            \bottomrule
+        \end{tabular}
+    \end{center}
+\end{table*}
+
+\subsection{Physical System}
+We consider an edge computing network illustrated in Fig. \ref{fig:system_model}, which consists of $S$ edge computing servers. We use $\mathcal{S} = \{1,2,...,S\}$ to represent the substructures which are contained by the dashed rectangles in Fig. \ref{fig:system_model} including an edge computing server, a battery, a renewable energy source, and the local grid. Thus, in this paper, we use the index of the substructure to refer to the associated devices. All the batteries are connected with each other in the battery management system (BMS), so the energy in the batteries can be provided mutually among the servers. More specifically,  
+\begin{itemize}
+    \item A server can be powered by the local grid, its associated renewable energy source, and all the batteries. 
+    \item The battery, associated with a computing server, can be charged by the local grid and its associated renewable energy source. Besides the associated server, the battery can provide energy for any other servers though there will be losses in energy transfer.
+\end{itemize}
+
+\subsection{Time Slotted Horizon}
+We consider a scheduling horizon divided into $T$ time slots. Denote the time slots by $\mathcal{T} = \{1,2,...,T\}$. There are $N$ tasks that are the same type in the edge computing network, represented by $\mathcal{N} = \{1, 2, ..., N\}$. Any task $n$ consists of a tuple $(o_n, d_n, s_n)$ where $o_n, d_n \in \mathcal{T}, s_n \in \mathcal{S}$, and
+\begin{itemize}
+    \item $o_n$ is the time slot when the task can be handled;
+    \item $d_n$ is the deadline of completing the task;
+    \item $s_n$ is the server that the task is initially associated with.
+\end{itemize}
+The tasks can be offloaded among the servers, and we assume that all the servers have the same specification and computing power, i.e., the amounts of energy that different servers require to complete a task are the same, denoted by $E$. For convenience, all the related parameters are normalized by $E$, so the energy that a task requires to be completed is one unit.
+
+We use $I_{st}$ and $R_{st}$ to denote the carbon intensity of local grid $s$ and the amount of renewable energy from source $s$ in time slot $t$, respectively\footnote{The prediction data can be obtained from for example \cite{ElectricityMaps} and \cite{li2019renewable}, respectively.}. They are both normalized by $E$, and the unit of $I_{st}$ is g\ce{CO2}eq/$E$kWh.
+
+\subsection{Carbon Footprint Analysis} \label{subsec:CFA}
+In the system model, the CF only occurs in three processes related to the grids, including battery charging, task completing, and tasks transmission. Specifically:
+\begin{enumerate}
+    \item {\em Batteries charging}: There will be $I_{st}$ carbon emissions if local grid $s$ in time slot $t$ charges each unit of energy to the battery.
+    \item {\em Tasks completing}: Similarly, there will be $I_{st}$ carbon emissions if server $s$ completes each task in time slot $t$ via the energy provided by the grid.
+    \item {\em Tasks transmission}: We use $\alpha_{s\hat{s}}$ to represent the required energy for each task transmission from associated server ${s}$ to $\hat{s}$, so the amount of carbon emission is $\alpha_{{s}\hat{s}}I_{{s}t}$ for each task offloaded from server ${s}$ to $\hat{s}$ in time slot $t$.
+\end{enumerate}
+In addition, there are losses in the energy transfer between the battery to the foreign servers. We convert this loss to equivalent CF such that we can analyze the CF more explicitly. Furthermore, we denote the energy loss per unit of energy from the battery ${s}$ to server $\hat{s}$ by $\beta_{{s}\hat{s}}$. We suppose that local grid $\hat{s}$ provide energy to make up for the loss, so the equivalent CF of loss is the CF of energy provided by local grid $\hat{s}$ in time slot $t$, i.e., $\beta_{{s}\hat{s}}I_{\hat{s}t}$. We have listed the important notations with respect to CF in Table \ref{tab:notation}.
+
+We show a set of the USA's domestic carbon intensity data and another set of European international one in table \ref{tab:data} from \cite{ElectricityMaps}. As we can see, there are huge differences between some two regions. For example, the CF of Oregon is five times higher than Washington because the electricity in Washington is almost from hydro and wind. However, 63\% of electricity in Oregon is from fossil fuels, so its carbon intensity is fairly high. We also can see that the intensity in Oregon at 24:00 is reduced by 31.7\% compared with that at 08:00. It is absolutely possible that we schedule and offload our tasks to reduce the CF. 
+
+The data also reveals that energy efficiency is not equivalent to low CF. If we focus on energy efficiency, task transmission will be never considered because the transmission means more energy consumption. However, if we pursue low CF, we will transmit tasks to the low-CF areas to complete them there. Not only to reduce the impact of global warming, from the perspective of humanity, CF is but also a better metric for energy instead of efficiency. This is because low-CF energy is usually sustainable, but fossil fuels are infinite. 
+
+In addition, the price of electricity is usually cheaper for more low-CF electricity, for example, the price in Germany is usually ten times higher than in Sweden. Furthermore, the reduced amount of CF can be sold in carbon markets (e.g., EU Emissions Trading System). So, reducing the CF also helps the server owner reduce the cost. Given this, we consider reducing the CF in edge computing networks.
+
+\begin{table}[h]
+    \caption{\label{tab:data}Two real-world sets of carbon intensity data}
+    \begin{center}
+        \begin{tabular}{*{5}{llrrr}}
+            \toprule
+            \midrule
+             \multicolumn{2}{c}{\multirow{2}{*}{\bf Region}} & \multicolumn{3}{c}{\bf Carbon intensity}\\
+             \cmidrule(lr){3-5}
+            \multicolumn{2}{c}{} & 08:00 & 16:00 & 24:00 \\
+            \midrule
+             \multirow{3}{*}{\begin{turn}{90} USA \end{turn}} & Washington & 110 & 95  & 95\\
+             & Oregon & 605 & 579 & 413\\
+             & California & 325 & 292  & 238\\
+            \midrule
+             \multirow{3}{*}{\begin{turn}{90} Europe \end{turn}} & Sweden & 24 & 26 & 25\\
+             & Germany & 375 & 285 & 381\\
+             & Poland & 593 & 573 & 547\\
+            \midrule
+            \bottomrule
+        \end{tabular}
+    \end{center}
+\end{table}
+
+
+\section{Problem Solving}
+
+\input{fig-networkflow}
+
+We consider minimizing the total CF in the edge computing network via scheduling charging the batteries and offloading the tasks. The CF minimization problem corresponds a min cost flow problem, and the corresponding graph is illustrated in Fig. \ref{fig:networkflow}. Generally speaking, the flows in the graph represent the energy transfers, and the costs of edges are the CF of the corresponding processes. The green and the yellow nodes are supply and demand nodes, respectively, and the sum of supply is equal to the sum of demand.
+
+Let us introduce the detail of the graph. Note that the costs and capacities of edges default to zero and infinite if we do not specify them next, respectively. 
+
+\subsection{Perspective of a time slot}
+
+As we can see, except all the yellow nodes and the green node $\delta$, the nodes can be divided into $T$ substructures by time slots. Looking into a substructure, there are three types of entities that are $\theta$-nodes, $(\kappa\rightarrow\rho)$-pairs, and $(\lambda\rightarrow\varepsilon)$-pairs:
+\begin{enumerate}
+    \item Any green node $\theta^{t}_{s}$ is the supply node in the graph, and its supplied flows represents how many units of energy renewable energy source $s$ can provide in time slot $t$.
+    \item In any red pair $(\kappa^{t}_{s}\rightarrow\rho^{t}_{s})$, both the two nodes are transshipment nodes. The capacity of the edge in the pair is set to be the capacity of battery $s$, so the pair represents battery $s$ in time slot $t$.
+    \item Any blue pair $(\lambda^{t}_{s}\rightarrow\varepsilon^{t}_{s})$ represents server $s$ in time slot $t$, the two nodes of which are both transshipment nodes. The capacity of the edge is the number of tasks that server $s$ can handle in time slot $t$.
+\end{enumerate}
+
+In addition, there are two types of edges involved in the three above-mentioned types of entities. We show the meanings of the flows through these edges:
+\begin{enumerate}
+    \item Flows through edge from green node $\theta^{t}_{s}$ to red node $\kappa^{t}_{s}$ represents that renewable energy $s$ charge battery $s$ in time slot $t$.
+    \item Flows through edge from red node $\kappa^{t}_{\dot{s}}$ to blue node $\lambda^{t}_{\hat{s}}$ represents that battery $\dot{s}$ provides energy to server $\hat{s}$ in time slot $t$. The cost of the edge is $\beta_{\dot{s}\hat{s}}I_{\hat{s}t}$ if $\dot{s}\neq\hat{s}$, otherwise zero.
+\end{enumerate}
+
+\subsection{Perspective of two neighbor time slots}
+Between two neighbor time slots $t$ and $t+1$, there are $S$ edges from nodes $\rho^{t}_{s}$ to $\kappa^{t+1}_{s}$. The edges mean the evolution of the batteries in the time slots. According to flow balance constraint, node $\kappa^{t+1}_{s}$ will receive flows that are from node $\rho^{t}_{s}$ except these to node $\lambda^{t}_{s}$. 
+
+\subsection{Perspective of the grids}
+
+We also can see that there are two types of edges from supply node $\delta$ that represent the grids to the substructures:
+\begin{enumerate}
+    \item The energy can be sent through the edge from supply node $\delta$ from to red node $\kappa^{t}_{s}$, and it represents local grid $s$ charge battery $s$ in time slot $t$. Clearly, its cost is $I_{st}$.
+    \item Local grid $s$ can provide energy to server $s$ in time slot $t$ as well, and similarly the cost of the edge from supply node $\delta$ from to blue node $\lambda^{t}_{s}$ is $I_{st}$.
+\end{enumerate}
+There is also an edge from node $\delta$ to yellow demand node $\mu$ that is used for receiving the redundant flows. The number of node $\delta$'s supplied flows is large enough, or say $N$. 
+
+\subsection{Perspective of the tasks}
+
+Let us look into the substructure named Tasks in the graph where yellow demand node $\tau_n$ represents task $n$. The demand value of any node $\tau_n$ is one. Any edge from blue node $\varepsilon^{t}_{s}$ to yellow node $\tau_{n}$ represents that server $s$ can handle task $n$ in time slot $t$ before the deadline. According to the information of all the tasks' tuples, the edges between $\varepsilon$-nodes and $\tau$-nodes are obvious. Regarding the cost of the edges, note that we have accounted for the CF of task $n$ completed by server $s$ via the cost of the edge between green node $\delta$ and blue node $\lambda^{t}_{s}$, so the cost of the edges is used for accounting for the CF of task offloading. Therefore, the cost of edge from node $\varepsilon^{t}_{s}$ to $\tau_n$ is $\alpha_{s_{n}s}I_{s_{n}t}$ if ${s}\neq{s_{n}}$, otherwise zero.
+
+\subsection{Algorithms and complexity}
+
+We have introduced all the nodes and edges in the graph. The min cost flow problem can be solved by existing algorithms in polynomial time \cite{10.5555/137406}, for example, the network simplex algorithm.
+
+\section{Performance Evaluation}
+
+\section{Conclusion} \label{Sec:conclusion}
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{mybibtex}
+
+
+\end{document}
