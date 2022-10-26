@@ -39,6 +39,50 @@
 \usepackage{rotating}
 \usetikzlibrary{spy} %
 \pgfplotsset{width=8.6cm, height=6.5cm, compat=1.9}
+
+\usetikzlibrary{calc}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.16}
+% from https://tex.stackexchange.com/a/102770/121799
+\def\pgfplotsinvokeiflessthan#1#2#3#4{%
+    \pgfkeysvalueof{/pgfplots/iflessthan/.@cmd}{#1}{#2}{#3}{#4}\pgfeov
+}%
+\def\pgfplotsmulticmpthree#1#2#3#4#5#6\do#7#8{%
+    \pgfplotsset{float <}%
+    \pgfplotsinvokeiflessthan{#1}{#4}{%
+        % first key <:
+        #7%
+    }{%
+        \pgfplotsinvokeiflessthan{#4}{#1}{%
+            % first key >:
+            #8%
+        }{%
+            % first key ==:
+            \pgfplotsset{float <}%
+            \pgfplotsinvokeiflessthan{#2}{#5}{%
+                % second key <
+                #7%
+            }{%
+                \pgfplotsinvokeiflessthan{#5}{#2}{%
+                    % second key >
+                    #8%
+                }{%
+                    % second key ==
+                    \pgfplotsset{float <}%
+                    \pgfplotsinvokeiflessthan{#3}{#6}{%
+                        % third key <
+                        #7%
+                    }{%
+                        % third key >=
+                        #8%
+                    }%
+                }%
+            }%
+        }%
+    }%
+}%
+
  
 \ifCLASSOPTIONcompsoc 
   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
@@ -107,7 +151,7 @@ font=\footnotesize,
 \maketitle
 
 \begin{abstract}
-To reduce the threats of more extreme climate, we aim to reduce carbon footprint in edge computing networks with renewable energy and batteries. Considering the spatial and temporal difference of carbon intensity of electricity, the tasks in the networks can be offloaded to these lower-CF edge servers though this might make additional CF. We are wondering how much task offloading can help reduce CF. In this paper, we first discuss the CFs occurring in the networks, then we consider scheduling task offloading and battery charging to minimize the total CF. Although the CF minimization problem is formulated as an integer programming, we show the problem can be visualized as a min cost flow problem that can be solved to the optimum. Numerical results using real-world data show a significant carbon footprint reduction compared with two benchmark schemes.
+To reduce the threats of more extreme climate, we aim to reduce carbon footprint (CF) in edge computing networks with renewable energy and batteries. Considering the spatial and temporal difference of carbon intensity of electricity among different regions, offloading the tasks to those edge servers in lower carbon-intensity areas can help reduce the total CF. In this paper, we consider scheduling and offloading the tasks as well as charging and discharging the batteries to minimize the total CF. We formulate this CF minimization problem as an integer linear programming, then we present the problem is equivalent to a min cost flow problem that can be solved to the optimum in polynomial time. Numerical results using real-world data show a significant carbon footprint reduction compared with two benchmark schemes.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -248,6 +292,7 @@ where the objective function \eqref{obj} is the overall CF from the network.
 \section{Problem Solving} 
 
 \input{fig-networkflow}
+
 Although the CF minimization problem is formulated as ILP in \eqref{formulation}, it corresponds a min cost flow problem that can be solved in polynomial time. We show the corresponding graph in Fig. \ref{fig:networkflow}. Generally speaking, the flows in the graph represent the energy transfers, and the costs of edges are the CF of the corresponding processes. The green and the yellow nodes are supply and demand nodes, respectively, and the sum of supply is equal to the sum of demand.
 
 Let us introduce the detail of the graph. Note that the costs and capacities of edges default to zero and infinite if we do not specify them next, respectively. 
@@ -284,6 +329,9 @@ Regarding the cost of the edges, we use the cost of the edges to account for the
 We have introduced all the nodes and edges in the graph, and we have shown all the constraints of Problem \eqref{formulation} have corresponding constraint in the min cost flow problem. In addition, by setting the costs of different edges, the objective function of the min cost flow problem is equivalent to \eqref{obj}. The min cost flow problem can be solved by existing algorithms in polynomial time \cite{10.5555/137406}, for example, the network simplex algorithm.
 
 \section{Performance Evaluation}
+
+\input{result1}
+
 
 \section{Conclusion} \label{Sec:conclusion}
 

@@ -1,0 +1,143 @@
+\begin{figure}[t]
+	\begin{center}
+
+    \pgfplotstableread[col sep=comma,header=true]{%
+    y,x,myvalue
+    0 ,  7 ,  27464.1
+    5 ,  7 ,  14408.1
+    10 ,  7 ,  9417.0
+    15 ,  7 ,  7024.5
+    20 ,  7 ,  6030.4
+    25 ,  7 ,  5610.0
+    30 ,  7 ,  5333.9
+    0 ,  8 ,  24431.0
+    5 ,  8 ,  13741.2
+    10 ,  8 ,  9063.1
+    15 ,  8 ,  6639.3
+    20 ,  8 ,  5808.4
+    25 ,  8 ,  5314.4
+    30 ,  8 ,  5094.4
+    0 ,  9 ,  22348.9
+    5 ,  9 ,  13279.9
+    10 ,  9 ,  8967.8
+    15 ,  9 ,  6499.8
+    20 ,  9 ,  5657.5
+    25 ,  9 ,  5182.6
+    30 ,  9 ,  4924.0
+    0 ,  10 ,  20266.8
+    5 ,  10 ,  12849.5
+    10 ,  10 ,  8885.2
+    15 ,  10 ,  6434.8
+    20 ,  10 ,  5536.5
+    25 ,  10 ,  5050.8
+    30 ,  10 ,  4829.8
+    0 ,  11 ,  19292.6
+    5 ,  11 ,  12518.0
+    10 ,  11 ,  8802.6
+    15 ,  11 ,  6402.3
+    20 ,  11 ,  5443.5
+    25 ,  11 ,  4975.0
+    30 ,  11 ,  4819.0
+    0 ,  12 ,  18799.8
+    5 ,  12 ,  12376.8
+    10 ,  12 ,  8720.0
+    15 ,  12 ,  6402.3
+    20 ,  12 ,  5378.5
+    25 ,  12 ,  4910.0
+    30 ,  12 ,  4808.2
+    0 ,  13 ,  18452.7
+    5 ,  13 ,  12268.8
+    10 ,  13 ,  8637.4
+    15 ,  13 ,  6402.3
+    20 ,  13 ,  5313.5
+    25 ,  13 ,  4877.5
+    30 ,  13 ,  4797.4
+    }{\datatable}
+    %
+    %\pgfplotstablesort[col sep=comma,header=true]\resulttable{\datatable}
+    \pgfplotstablesort[create on use/sortkey/.style={
+            create col/assign/.code={%
+                \edef\entry{{\thisrow{x}}{\thisrow{y}}{\thisrow{myvalue}}}%
+                \pgfkeyslet{/pgfplots/table/create col/next content}\entry
+            }
+        },
+        sort key=sortkey,
+        sort cmp={%
+            iflessthan/.code args={#1#2#3#4}{%
+                \edef\temp{#1#2}%
+                \expandafter\pgfplotsmulticmpthree\temp\do{#3}{#4}%
+            },
+        },
+        sort,
+        columns/Mtx/.style={string type},
+        columns/Kind/.style={string type},]\resulttable{\datatable}
+    
+    \begin{tikzpicture}%[x={(0.866cm,-0.5cm)},y={(0.866cm,0.5cm)},z={(0cm,1 cm)}]
+        \pgfplotsset{set layers}
+        \begin{axis}[% from section 4.6.4 of the pgfplotsmanual
+                view={120}{40},
+                width=0.5*\textwidth,
+                height=0.4375*\textwidth,
+                z buffer=none,
+                xmin=6.5, xmax=13,
+                ymin=-1, ymax=30,
+                zmin=0, zmax=56000,
+                enlargelimits=upper,
+                ztick={25000, 50000},
+                zticklabels={2.5, 5}, % here one has to "cheat"
+                % meaning that one has to put labels which are the actual value 
+                % divided by 2. This is because the bars will be centered at these
+                % values
+                xtick=data,
+                extra tick style={grid=major},
+                ytick=data,
+                grid=minor,
+                xlabel={$H$},
+                ylabel={$L$},
+                zlabel={Total CF},
+                minor tick num=1,
+                point meta=explicit,
+                colormap name=viridis,
+                scatter/use mapped color={
+                    draw=mapped color,fill=mapped color!60},
+                execute at begin plot={}            
+                ]
+        \path let \p1=($(axis cs:0,0,1)-(axis cs:0,0,0)$) in 
+        \pgfextra{\pgfmathsetmacro{\conv}{2*\y1}
+        \ifx\gconv\conv
+        \else
+        \xdef\gconv{\conv}
+        \typeout{Please\space recompile\space the\space file!}
+        \fi     
+                };  
+        \path let \p1=($(axis cs:1,0,0)-(axis cs:0,0,0)$) in 
+        \pgfextra{\pgfmathsetmacro{\convx}{veclen(\x1,\y1)}
+        \typeout{One\space unit\space in\space x\space 
+                direction\space is\space\convx pt}
+                };                  
+        \path let \p1=($(axis cs:0,1,0)-(axis cs:0,0,0)$) in 
+        \pgfextra{\pgfmathsetmacro{\convy}{veclen(\x1,\y1)}
+        \typeout{One\space unit\space in\space y\space 
+                direction\space is\space\convy pt}
+                };                  
+        \addplot3 [visualization depends on={
+        \gconv*z \as \myz}, % you may have to recompile to get the prefactor right
+        scatter/@pre marker code/.append style={/pgfplots/cube/size z=\myz},%
+        scatter/@pre marker code/.append style={/pgfplots/cube/size x=11.66135pt},%
+        scatter/@pre marker code/.append style={/pgfplots/cube/size y=9.10493pt},%
+        scatter,only marks,
+        mark=cube*,mark size=5,opacity=1]
+         table[x expr={\thisrow{x}},y expr={\thisrow{y}},z
+         expr={1*\thisrow{myvalue}},
+         meta expr={-1*\thisrow{x}}
+                ] \resulttable;
+            \end{axis}
+        \makeatletter
+        \immediate\write\@mainaux{\xdef\string\gconv{\gconv}\relax}
+        \makeatother
+    
+    \end{tikzpicture}
+
+	\end{center}
+	\caption{The figure shows the system model, in which the arrows represent the directions of energy flow.}\label{fig:result1}
+\end{figure}
