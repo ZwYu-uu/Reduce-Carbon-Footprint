@@ -17,7 +17,6 @@
 \usepackage[ruled,linesnumbered,vlined]{algorithm2e}  
 \usepackage{color}
 \usepackage{enumerate}
-\usepackage{caption}
 \usepackage[left=0.65in, right=0.65in, top=0.7in, bottom = 0.98in]{geometry}
 \usepackage{tabularx,booktabs}
 \usepackage{ifpdf}
@@ -36,54 +35,12 @@
 \renewcommand{\algorithmicensure}{\textbf{Output:}} 
 \usepackage{array} 
 \usepackage{tikz,pgfplots,filecontents}
-\usepackage{pgfplots}
 \usepackage{rotating}
 \usetikzlibrary{spy} %
 \pgfplotsset{width=8.6cm, height=6.5cm, compat=1.9}
 
 \usetikzlibrary{calc}
-\usepackage{pgfplots}
 \usepackage{pgfplotstable}
-\pgfplotsset{compat=1.16}
-% from https://tex.stackexchange.com/a/102770/121799
-\def\pgfplotsinvokeiflessthan#1#2#3#4{%
-    \pgfkeysvalueof{/pgfplots/iflessthan/.@cmd}{#1}{#2}{#3}{#4}\pgfeov
-}%
-\def\pgfplotsmulticmpthree#1#2#3#4#5#6\do#7#8{%
-    \pgfplotsset{float <}%
-    \pgfplotsinvokeiflessthan{#1}{#4}{%
-        % first key <:
-        #7%
-    }{%
-        \pgfplotsinvokeiflessthan{#4}{#1}{%
-            % first key >:
-            #8%
-        }{%
-            % first key ==:
-            \pgfplotsset{float <}%
-            \pgfplotsinvokeiflessthan{#2}{#5}{%
-                % second key <
-                #7%
-            }{%
-                \pgfplotsinvokeiflessthan{#5}{#2}{%
-                    % second key >
-                    #8%
-                }{%
-                    % second key ==
-                    \pgfplotsset{float <}%
-                    \pgfplotsinvokeiflessthan{#3}{#6}{%
-                        % third key <
-                        #7%
-                    }{%
-                        % third key >=
-                        #8%
-                    }%
-                }%
-            }%
-        }%
-    }%
-}%
-
  
 \ifCLASSOPTIONcompsoc 
   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
@@ -331,21 +288,42 @@ We have introduced all the nodes and edges in the graph, and we have shown all t
 
 \section{Performance Evaluation}
 
+
+In this section, we use one-day CI data of Sweden, Germany, and Poland from \cite{ElectricityMaps} to evaluate the performance of our proposed method. In our simulation, the length of a time slot is an hour. We assume that 7 am to 7 pm are daytime, and the other hours are night. The REs in daytime for time slot follow a binomial distribution $B(5, 0.5)$, and in night they are set to be zero. In addition, all the tasks' $o_{n}$, $d_n$ ($o_n \leq d_n$), and $s_n$ all follow discrete uniform distribution. In addition, we set $\mathcal{S}_n = \mathcal{S}$ $\forall n \in \mathcal{N}$, i.e., all the tasks can be offloaded among all the servers. Other simulation parameters are listed in Table \ref{tab:parameters}. Note that the values of CF in our results are all normalized by $E$. 
+
+\begin{table}[h]
+    \caption{\label{tab:parameters}Simulation Parameters}
+    \begin{center}
+        \begin{threeparttable}[b]
+            \begin{tabular}{*{2}{lr}}
+                \toprule
+                \midrule
+                {\bf Parameter} & {\bf Value}\\
+                \midrule
+                 The number of time slots $T$ & $24$ \\
+                 The number of servers $S$ & $3$\\
+                 The number of tasks $N$ & $100$\\
+                 The energy for one task transfer $\alpha$ & 0.1\\
+                 Loss for one unit of energy transfer $\beta$ & $0.2$\\
+                \bottomrule
+            \end{tabular}
+        \end{threeparttable}
+    \end{center}
+\end{table}
+
 \input{result1}
+
+Fig. \ref{fig:result1} shows the performance results of our propose method for various battery capacity $L$ and server capacity $H$. As we can see that there is a drastic reduction (almost a half) of CF when battery capacity becomes $5$ from $0$ for any server capacity. This is because we can schedule and share low-CF energy among the servers via battery and BMS. When battery capacity $L$ is greater than $15$, the total CF is hardly changed because the batteries can already store all the energy required by all the tasks when $L = 15$. In addition, when the server capacity increases, the total CF decreases as more tasks can be offloaded to those servers in low-CI areas.
 
 \input{result2}
 
 \input{result3}
 
-balabalabala
-balabalabala
-balabalabala
-balabalabala
-balabalabala
-balabalabala
-balabalabala
-balabalabala
-balabalabala
+We also compare our method with three benchmark schemes. (which countries as data)
+
+
+
+
 
 \section{Conclusion} \label{Sec:conclusion}
 
