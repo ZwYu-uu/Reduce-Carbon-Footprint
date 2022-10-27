@@ -17,7 +17,7 @@
         %		    ytick={0, 1000, 2000, 3000},
         		%	point meta=y *10^3, % the displayed number
         		  %  legend pos=north east,
-        		    legend style={at={(0.48, 0.75)},anchor=west},
+        		    legend style={at={(0.43, 0.75)},anchor=west},
         		    %ymajorgrids=true,    
         		    %xmajorgrids=true,
         		    grid style=densely dashed,
@@ -40,20 +40,6 @@
                     ( 17 , 2521.1 )
             		};
             		%
-            		\addplot[ color=blue, mark=o, dotted, mark options={solid}, line width=0.8pt]     
-            		coordinates {
-                    ( 8 , 6818.0 )
-                    ( 9 , 6816.0 )
-                    ( 10 , 6815.0 )
-                    ( 11 , 6815.0 )
-                    ( 12 , 6815.0 )
-                    ( 13 , 6815.0 )
-                    ( 14 , 6815.0 )
-                    ( 15 , 6815.0 )
-                    ( 16 , 6815.0 )
-                    ( 17 , 6815.0 )
-            		};
-            		
             		\addplot[ color=black, mark=triangle, densely dashed, mark options={solid}, line width=0.8pt]
             		coordinates {
                     ( 8 , 9506.6 )
@@ -66,6 +52,20 @@
                     ( 15 , 2766.0 )
                     ( 16 , 2528.3 )
                     ( 17 , 2521.1 )
+            		};
+            		
+            		\addplot[ color=blue, mark=o, dotted, mark options={solid}, line width=0.8pt]
+            		coordinates {
+                    ( 8 , 6818.0 )
+                    ( 9 , 6816.0 )
+                    ( 10 , 6815.0 )
+                    ( 11 , 6815.0 )
+                    ( 12 , 6815.0 )
+                    ( 13 , 6815.0 )
+                    ( 14 , 6815.0 )
+                    ( 15 , 6815.0 )
+                    ( 16 , 6815.0 )
+                    ( 17 , 6815.0 )
             		};
             		
             		\addplot[ color=brown, mark=x, dashed, mark options={solid}, line width=0.8pt]
@@ -82,7 +82,7 @@
                     ( 17 , 15065.0 )
             		};
 
-            		\legend{w/ offloading and BMS, w/o offloading w/ BMS, w/ offloading w/o BMS, w/o offloading and BMS}
+            		\legend{S1: w/ offloading w/ BMS, S2: w/ offloading w/o BMS, S3: w/o offloading w/ BMS, S4: w/o offloading w/o BMS}
         		
         		\end{axis}
     		\end{tikzpicture}
