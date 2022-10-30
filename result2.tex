@@ -10,7 +10,7 @@
         		    %title={},
         		    xlabel={The battery capacity $L$},
         		    ylabel={Total CF},
-        		    xmin=1, xmax=10,
+        		    xmin=0, xmax=14,
         		    ymin=0, ymax=22000,
         		  %  xtick={25, 50, 75, 100, 125, 150},
         		%	xticklabels=\empty,
@@ -27,7 +27,8 @@
         		
             		\addplot[ color=red, mark=square, line width=0.8pt]     
             		coordinates { 
-            		( 1 , 9342.1 )
+                    ( 0 , 11061.0 )
+                    ( 1 , 9342.1 )
                     ( 2 , 7706.7 )
                     ( 3 , 6087.9 )
                     ( 4 , 4689.1 )
@@ -37,11 +38,16 @@
                     ( 8 , 2674.2 )
                     ( 9 , 2539.1 )
                     ( 10 , 2425.4 )
+                    ( 11 , 2311.7 )
+                    ( 12 , 2210.0 )
+                    ( 13 , 2113.5 )
+                    ( 14 , 2078.4 )
             		};
             		%
             		
             		\addplot[ color=black, mark=triangle, densely dashed, mark options={solid}, line width=0.8pt]
             		coordinates {
+                    ( 0 , 11061.0 )
                     ( 1 , 10218.3 )
                     ( 2 , 9378.0 )
                     ( 3 , 8537.7 )
@@ -52,10 +58,15 @@
                     ( 8 , 4812.6 )
                     ( 9 , 4245.1 )
                     ( 10 , 3682.4 )
+                    ( 11 , 3119.7 )
+                    ( 12 , 2614.0 )
+                    ( 13 , 2113.5 )
+                    ( 14 , 2078.4 )
             		};
             		
             		\addplot[ color=blue, mark=o, dotted, mark options={solid}, line width=0.8pt]
             		coordinates {
+                    ( 0 , 19787.0 )
                     ( 1 , 16053.6 )
                     ( 2 , 13501.4 )
                     ( 3 , 11056.8 )
@@ -66,10 +77,15 @@
                     ( 8 , 3679.6 )
                     ( 9 , 3582.6 )
                     ( 10 , 3496.2 )
+                    ( 11 , 3413.2 )
+                    ( 12 , 3330.2 )
+                    ( 13 , 3247.2 )
+                    ( 14 , 3188.2 )
             		};
 
             		\addplot[ color=brown, mark=x, dash dot, mark options={solid}, line width=0.8pt]
             		coordinates {
+                    ( 0 , 19787.0 )
                     ( 1 , 18807.0 )
                     ( 2 , 17852.0 )
                     ( 3 , 16923.0 )
@@ -80,6 +96,10 @@
                     ( 8 , 13919.0 )
                     ( 9 , 13537.0 )
                     ( 10 , 13155.0 )
+                    ( 11 , 12773.0 )
+                    ( 12 , 12391.0 )
+                    ( 13 , 12009.0 )
+                    ( 14 , 11723.0 )
             		};
 
             		\legend{S1: w/ offloading w/ BMS, S2: w/ offloading w/o BMS, S3: w/o offloading w/ BMS, S4: w/o offloading w/o BMS}
@@ -88,5 +108,5 @@
     		\end{tikzpicture}
     		
         \end{center}
-    \caption{Caption.}\label{fig:result2}
+    \caption{The total CF as function of the battery capacity $L$ with $H = 10$.}\label{fig:result2}
 \end{figure}

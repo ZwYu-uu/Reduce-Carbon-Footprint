@@ -17,6 +17,7 @@
 \usepackage[ruled,linesnumbered,vlined]{algorithm2e}  
 \usepackage{color}
 \usepackage{enumerate}
+\usepackage{makecell}
 \usepackage[left=0.65in, right=0.65in, top=0.7in, bottom = 0.98in]{geometry}
 \usepackage{tabularx,booktabs}
 \usepackage{ifpdf}
@@ -37,7 +38,27 @@
 \usepackage{tikz,pgfplots,filecontents}
 \usepackage{rotating}
 \usetikzlibrary{spy} %
-\pgfplotsset{width=8.6cm, height=6.5cm, compat=1.9}
+\pgfplotsset{width=8.6cm, height=6cm, compat=1.9}
+
+\usepackage{physics}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{mathdots}
+\usepackage{yhmath}
+\usepackage{cancel}
+\usepackage{color}
+\usepackage{siunitx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{tabularx}
+\usepackage{extarrows}
+\usepackage{booktabs}
+\usetikzlibrary{fadings}
+\usetikzlibrary{patterns}
+\usetikzlibrary{shadows.blur}
+\usetikzlibrary{shapes}
 
 \usetikzlibrary{calc}
 \usepackage{pgfplotstable}
@@ -47,9 +68,13 @@
 \else
   \usepackage[caption=false,font=footnotesize]{subfig}
 \fi
+
+\usepackage{tikz-network}
+\usetikzlibrary{shapes}
  
 \usepackage{url}
 \usepackage{hyperref}
+
 
 \makeatletter
 \let\NAT@parse\undefined
@@ -92,7 +117,9 @@ font=\footnotesize,
 
 \begin{document}
 
-\title{Less Carbon Footprint in Edge Computing: How Much May Task Offloading Help?}
+\title{Less Carbon Footprint in Edge Computing by Joint Task Offloading and Energy Sharing}
+% \title{Less Carbon Footprint in Edge Computing: The Case of Joint Task Offloading and Battery Sharing}
+
  
 \author{Zhanwei Yu\textsuperscript{1}, Yi Zhao\textsuperscript{1}, Tao Deng\textsuperscript{2}, Lei You\textsuperscript{3}, and Di Yuan\textsuperscript{1}}
 \affil{\textsuperscript{1}Department of Information Technology, Uppsala University, Sweden
@@ -109,7 +136,7 @@ font=\footnotesize,
 \maketitle
 
 \begin{abstract}
-To reduce the threats of more extreme climate, we aim to reduce carbon footprint (CF) in edge computing networks with renewable energy and batteries. Considering the spatial and temporal difference of carbon intensity of electricity among different regions, offloading the tasks to those edge servers in lower carbon-intensity areas can help reduce the total CF. In this paper, we consider scheduling and offloading the tasks as well as charging and discharging the batteries to minimize the total CF. We formulate this CF minimization problem as an integer linear programming, then we present the problem is equivalent to a min cost flow problem that can be solved to the optimum in polynomial time. Numerical results using real-world data show a significant CF reduction compared to three benchmark schemes.
+In sprite the state-of-the-art, significantly reducing carbon footprint (CF) in communications systems remains urgent. We address this challenge in the context of edge computing. The carbon intensity of electricity supply largely varies spatially as well as temporally. This, together with energy sharing via a battery management system (BMS), justifies the potential of CF-oriented task offloading, by redistributing the computational tasks in time and space. In this paper, we consider optimal task scheduling and offloading, as well as battery charging and discharging to minimize the total CF. We formulate this CF minimization problem as an integer linear programming model. However, we demonstrate that, via a graph-based reformulation, the problem can be cast as a minimum-cost flow problem. This finding reveals that global optimum can be admitted in polynomial time. Numerical results using real-world data show that optimization can reduce up to $83.3\%$ of the total CF.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -118,17 +145,17 @@ carbon footprint, scheduling, edge computing.
 
 
 \section{Introduction}
-The study in \cite{https://doi.org/10.48550/arxiv.2102.02622} points out that the current carbon footprint (CF) in information and communications technology (ICT) sector could be as high as $2.1\%$ to $3.9\%$, which is more than the $2\%$ that the baseline estimates for policy making in Europe. The authors of \cite{perrons2021digital} list four potential measures that can significantly help reduce the CF from the ICT industry, one of which is edge computing. 
+The current carbon footprint (CF) in information and communications technology (ICT) sector could be as high as $2.1\%$ to $3.9\%$ of the total figure \cite{https://doi.org/10.48550/arxiv.2102.02622}. This is more than the $2\%$ baseline in Europe. The authors of \cite{perrons2021digital} list four potential measures that can significantly help reduce the CF due to ICT, one of which is edge computing. 
 
-The edge servers consumes substantially less energy than conventional cloud data centers though they need to be densely deployed. For achieving green edge computing, researches are conducted for the design of networks \cite{mao2017survey}, including dynamic right-sizing, geographical load balancing, and using renewable energy (RE). However, almost works with respect to green edge computing consider energy consumption or efficiency as the objective function, instead of CF. 
+The edge servers consume substantially less energy than conventional cloud data centers, though they need to be densely deployed. For green edge computing, research has been conducted for better design of networks \cite{mao2017survey}, including dynamic right-sizing, geographical load balancing, and the use of renewable energy. However, most works with respect to green edge computing consider energy consumption or efficiency as the objective function, rather than CF explicitly. 
 
-Although low energy consumption might imply low CF, they are not absolutely equivalent. For example, in an edge computing network consisting of uniform servers, considering only energy consumption blocks any task transfer that costs energy. On the other hand, transferring tasks towards low-CF areas straightforwardly contributes to CF reduction. We show a set of the USA's domestic carbon intensity (CI) data and another set of European international one in table \ref{tab:data} from \cite{ElectricityMaps}. As we can see, a huge difference could occur between two regions due to the different power generation ways. For example, the CI of Oregon is five times higher than that of Washington. Also, The CI of Oregon at 24:00 is 31.7\% less than 08:00. This motivates us to use the spatial and temporal information of CI to reduce CF by charging scheduling and task offloading.  
+Lower energy consumption contributes to reducing CF, however, they are not equivalent. For example, in an edge computing network consisting of uniform servers and task distribution, considering only energy consumption would render task offloading useless (which itself would cost energy). However, as the CF intensity differs by power source over time and space, offloading does help. We show a US domestic carbon intensity (CI) data set and another data set for three counties in Europe in Table \ref{tab:data} \cite{ElectricityMaps}. As we can see, there are large differences between spaces and time. For example, the CI in Oregon is five times higher than that in Washington. Also, The CI in Oregon at 24:00 is 31.7\% less than that at 08:00. The variation is due to the difference in the availability of various power sources over time and space. This motivates us to use the spatial and temporal information of CI to reduce CF by optimal task offloading and scheduling.  
 
 
 
 
 \begin{table}[h]
-    \caption{\label{tab:data}Two real-world sets of carbon intensity data}
+    \caption{\label{tab:data}Two real-world data sets of carbon intensity.}
     \begin{center}
         \begin{threeparttable}[b]
             \begin{tabular}{*{5}{llrrr}}
@@ -151,7 +178,7 @@ Although low energy consumption might imply low CF, they are not absolutely equi
             
             \begin{tablenotes}
             	\footnotesize
-            	\item[1]Unit: g\ce{CO2}eq/kWh.
+            	\item $^1$Unit: g\ce{CO2}eq/kWh.
             \end{tablenotes}
         \end{threeparttable}
     \end{center}
@@ -159,13 +186,33 @@ Although low energy consumption might imply low CF, they are not absolutely equi
 
 
 
-The studies in \cite{van2012distributed, Rad2022Carbon, do2015proximal, aldossary2021towards, yang2022carbon} have addressed CF in edge computing or fog computing. The authors of \cite{van2012distributed} provide a model that can estimate the CF in distributed data centers. Their results show the total CF from a set of distributed small data centers is less than that from a big data center when they have the same compute capability. The authors of \cite{Rad2022Carbon} provide a Lyapunov-based algorithm for a distributed data center to minimize electricity cost under a limit CF constraint. In \cite{do2015proximal}, the authors consider minimizing the CF for video streaming in fog computing networks. In addition, the studies in \cite{aldossary2021towards} and \cite{ahvar2021deca} both provide application placement methods to minimize the CF in fog computing networks. The authors of \cite{yang2022carbon} provide CI-aware task scheduling policy to minimize the CF of edge computing networks via the drift-plus-penalty methodology in Lyapunov optimization. 
+Of the current literature, we highlight the following contributions. The studies in \cite{van2012distributed, Rad2022Carbon, do2015proximal, aldossary2021towards, ahvar2021deca, yang2022carbon} have addressed CF in edge computing or fog computing. The authors of \cite{van2012distributed} provide a model that can estimate the CF in distributed data centers. Their results show that the total CF of a set of distributed small data centers is less than that from a big data center with equivalent compute capability. The authors of \cite{Rad2022Carbon} provide a Lyapunov-based algorithm for a distributed data center to minimize electricity cost subject to CF limit. In \cite{do2015proximal}, the authors consider minimizing the CF for video streaming in fog computing networks. In addition, the studies in \cite{aldossary2021towards} and \cite{ahvar2021deca} provide application placement methods to minimize the CF in fog computing networks. The authors of \cite{yang2022carbon} examine task scheduling policies to minimize the CF of edge computing networks via the drift-plus-penalty methodology in Lyapunov optimization. Table \ref{tab:difference} lists the features of our paper and the related works \cite{van2012distributed, Rad2022Carbon, do2015proximal, aldossary2021towards, ahvar2021deca, yang2022carbon}. Note that the works in \cite{van2012distributed, Rad2022Carbon, do2015proximal, aldossary2021towards, ahvar2021deca} only consider optimizing spatial or temporal dimension instead of joint spatio-temporal optimization. 
 
-In this paper, both tasks scheduling and tasks offloading are taken into account to minimize the CF, utilizing temporal and spatial information of CI. To the best of our knowledge, the work in \cite{yang2022carbon} is the closest to ours, yet the differences are significant. The system model in our paper considers battery charging on top of the offloading and scheduling. The existing of multiple RE sources and batteries create considerably higher complexity in problem solving. The main contributions of this paper is summarized below.
+
+\begin{table*}[h] % add energy sharing
+    \caption{\label{tab:difference}The difference among our paper and the related works.}
+    \begin{center}
+        \begin{threeparttable}[b]
+            \begin{tabular}{*{7}{lccccc}}
+                \toprule
+                \midrule
+                {\bf Work(s)} & \makecell[c]{\bf Renewable\\ \bf energy} & \makecell[c]{\bf Energy\\ \bf storage} &\makecell[c]{\bf Energy\\ \bf sharing} & \makecell[c]{\bf Spatio-temporal\\ \bf optimization} & \makecell[c]{\bf Task\\ \bf offloading}\\
+                \midrule
+                 \cite{van2012distributed} & \checkmark & & & &\\
+                 \cite{Rad2022Carbon, do2015proximal, aldossary2021towards, ahvar2021deca} & & & & & \checkmark \\ 
+                 \cite{yang2022carbon} & & & & \checkmark & \checkmark \\
+                 Our work & \checkmark & \checkmark & \checkmark & \checkmark& \checkmark\\
+                \bottomrule
+            \end{tabular}
+        \end{threeparttable}
+    \end{center}
+\end{table*}
+
+To the best of our knowledge, the work in \cite{yang2022carbon} is the closest to ours, yet the differences are significant. The system model in our paper considers battery charging on top of task offloading and scheduling, making our scenario more comprehensive. To be more exact, our paper considers task scheduling and offloading, as well as energy sharing with battery charging and discharging to minimize the CF, utilizing temporal and spatial information of CI. The main contributions of this paper are summarized below.
 \begin{itemize}
-    \item We show an edge computing network with RE sources and batteries, and discuss the CF in different parts of the network. We consider offloading and scheduling the tasks, and charging and discharging the batteries to reduce the total CF. 
-    \item We formulate this CF minimization problem as integer linear programming (ILP). Then we provide a method based on network flow that can solve the CF minimization problem in polynomial time though it is ILP.
-    \item We use real-world data to evaluate the performance. Compared with three benchmark schemes, the numerical results show that our proposed method can obtain a $83.3\%$ reduction of CF at most.
+    \item We consider an edge computing network with renewable energy sources and batteries, and model the CF for the resulting scenario. We consider task offloading and scheduling, as well as battery charging and discharging with energy sharing, with the objective of CF minimization. 
+    \item Due to the discrete nature of task offloadling, this CF minimization problem leads to an integer linear programming (ILP) model. However, we reveal that the structure of the problem admits a reformulation using minimum-cost flow problem, implying that its global optimum can be computed in polynomial time. Thus our optimization approach is highly scalable. 
+    \item We use real-world carbon intensity data to evaluate the performance. The numerical results show that, by optimal CF-aware task offloading and scheduling along with energy sharing, our optimization approach can reduce up to $83.3\%$ of the total CF.
 \end{itemize}
 
 \section{System Model and Problem Formulation}
@@ -173,127 +220,157 @@ In this paper, both tasks scheduling and tasks offloading are taken into account
 \input{fig-system_model}
 
 \subsection{System Model}
-We consider an edge computing network illustrated in Fig. \ref{fig:system_model}, which consists of $S$ edge computing servers. We use $\mathcal{S} = \{1,2,...,S\}$ to represent the sites illustrated by dashed rectangles in Fig. \ref{fig:system_model} including an edge computing server, a battery, a RE source, and the local grid. All the batteries are connected to each other in the battery management system (BMS), hence the energy in a battery can be 
-shared with the servers in other sites\footnote{The BMS has been studies widely in for example \cite{leithon2013online} and \cite{leithon2019task}}. In this paper, we use the index of the site to refer to its associated devices, e.g., server $s$, battery $s$, etc. More specifically,
+Fig. \ref{fig:system_model} shows $S$ sites (illustrated by dashed rectangles) forming an edge computing network. Let $\mathcal{S} = \{1,2,...,S\}$. Each site consists of an edge computing server, a battery, a local renewable energy source, and the local power grid. The servers have the same specification and computing power. The batteries are connected to each other via a battery management system (BMS), hence the energy in a battery can be shared with the servers on the other sites\footnote{The BMS has been studies widely, see for example \cite{leithon2013online} and \cite{leithon2019task}}. In this paper, we use the index of the site to refer to its components, e.g., server $s$, battery $s$, etc. More specifics of the system model are as follows;
 \begin{itemize}
-    \item A server can be powered by its local grid, its associated renewable energy source, and all the batteries. 
-    \item The battery, associated with a computing server, can be charged by the local grid and its associated renewable energy source. Additionally, the battery can provide energy for any other servers with an energy transfer loss.
+    \item A server can be powered by its local grid, its renewable energy source, and all the batteries. 
+    \item A local battery can be charged by the local grid and the local renewable energy source. Additionally, the battery can provide energy to any other server. However, this comes with an energy transfer loss.
 \end{itemize}
 
-\subsection{Time Slotted Horizon}
-We consider a scheduling horizon divided into $T$ time slots, denoted by $\mathcal{T} = \{1,2,...,T\}$. The tasks that are the same type in the network (i.e., the amount of energy to handle them are the same) is represented by $\mathcal{N} = \{1, 2, ..., N\}$. Any task $n$ is represented by a tuple $(o_n, d_n, s_n, \mathcal{S}_n)$ where $o_n, d_n \in \mathcal{T}, s_n \in \mathcal{S}, \mathcal{S}_n \subseteq \mathcal{S}$, and
+\subsection{Time Horizon}
+We consider a scheduling horizon of $T$ time slots, denoted by $\mathcal{T} = \{1,2,...,T\}$. The set of tasks over the entire time horizon is represented by $\mathcal{N} = \{1, 2, ..., N\}$. In this paper, the tasks are assumed to be of the same type, i.e., the amount of energy to complete them is uniform, denoted by $E$. Without loss of generality, we use $E$ as our energy unit, and the relevant parameters (e.g., $R$-, $I$-, $\alpha$-, $\beta$-parameters, $L$, and $H$ to be introduced next) are all normalized by $E$, i.e., they are given as some multiples of $E$. 
+
+Task $n$ is represented by a tuple $(o_n, d_n, s_n, \mathcal{S}_n)$, where $o_n, d_n \in \mathcal{T}, s_n \in \mathcal{S}, \mathcal{S}_n \subseteq \mathcal{S}$ such that
 \begin{itemize}
-    \item $o_n$ is the time slot when the task can be handled;
+    \item $o_n$ is the time slot when the task is generated;
     \item $d_n$ is the deadline of completing the task;
     \item $s_n$ is the server that the task is initially associated with;
-    \item $\mathcal{S}_n$ is the set of candidate servers that can do task $n$.
+    \item $\mathcal{S}_n$ represents the set of candidate servers\footnote{Some tasks might not want to be performed in some servers because of, for example, latency due to the distance.} that can perform task $n$.
 \end{itemize}
-The tasks can be offloaded among the their candidate servers, and we assume that all the servers have the same specification and computing power, i.e., the amounts of energy that different servers require to complete a task are the same, denoted by $E$ (kWh). For convenience, all the related parameters (e.g., $R$-, $I$-, $\alpha$-, and $\beta$-parameters to be introduced next) are normalized by $E$ such that a task completes in a unit of energy.
+A task is to be completed in some time slot of the interval $[o_n, d_n]$.
 
-For the tasks, denote by $x_{nst}$, $y_{nss^\prime t}$, and $z_{nst}$ binary variables that is one if and only if task $n$ is completed by server $s$ using energy in time slot $t$ from the local grid, battery $s^\prime$ and RE source, respectively. For any task, it only needs to be handled by a server in a time slot, so we have
-\begin{equation}\label{c1}
-    \sum_{s \in \mathcal{S}} \sum^{d_n}_{t = o_n} ( x_{nst} + \sum_{s^\prime \in S_n}  y _{nss^\prime t} + z_{nst}) = 1, \forall n \in \mathcal{N}.
+Denote by $\pi_{nst}$ a binary variable that is one if and only if task $n$ is completed by server $s$ in time slot $t$. For any task, it needs to be completed once, so we have
+\begin{equation}\label{c0}
+    \sum_{s \in \mathcal{S}} \sum^{d_n}_{t = o_n} \pi_{nst} = 1, \forall n \in \mathcal{N}.
 \end{equation}
 
-For the batteries, we use integer variables $u_{st}$ and $v_{st}$ to represent the amount of charging battery $s$ from the local grid and RE at the beginning of time slot $t$, respectively. In addition, denote by integer variable $w_{st}$ the remaining energy of battery $s$ in the end of time slot $t$. We use $L$ to present the capacity of the battery. At the beginning of time slot $t$, we have the following battery capacity constraint:
+In time slot $t$, the amount of energy consumed to task completion by server $s$ is $\sum_{n \in \mathcal{N}} \pi_{nst}$. For the consumed energy, we use variables $x_{st}$, $y_{ss^\prime t}$, and $z_{st}$ to represent the amount of energy (again normalized by $E$) to server $s$ from the local grid, battery $s^\prime$ and the local renewable source, respectively, in time slot $t$. Then we have
+\begin{equation}\label{c1}
+     x_{st} + \sum_{s^\prime \in S}  y _{ss^\prime t} + z_{st} = \sum_{n \in \mathcal{N}} \pi_{nst}, \forall s \in \mathcal{S}, t \in \mathcal{T}.
+\end{equation}
+In addition, the maximum number of tasks a server can complete in a time slot can be known by the computing capacity, denoted by $H$. Note that the required energy of a task is one unit, so we have the following constraint:
+\begin{equation}\label{c4}
+    x_{st}+\sum_{s^\prime \in\mathcal{S}} y_{ss^\prime t} +z_{st} \leq H, \forall s \in \mathcal{S}, t \in \mathcal{T}.
+\end{equation}
+
+For charging battery $s$ at the beginning of time slot $t$, we use variables $u_{st}$ and $v_{st}$ to represent the amounts of energy from the local grid and the renewable source, respectively. In addition, denote by variable $w_{st}$ the amount of the remaining energy of battery $s$ at the end of time slot $t$. We use $L$ to present the capacity of the battery. At the beginning of time slot $t$, we have the following battery capacity constraint:
 \begin{equation}\label{c2}
     u_{st} + v_{st} + w_{s(t-1)} \leq L, \forall s \in \mathcal{S}, t \in \mathcal{T} \setminus \{1\}.
 \end{equation}
 At the end of that, the remaining energy $w_{st}$ is calculated by
 \begin{equation}\label{c3}
-    w_{st} = u_{st} + v_{st} + w_{s(t-1)} - \sum_{n\in\mathcal{N}} \sum_{s^\prime \in \mathcal{S}_n} y_{nss^\prime t}, \forall s \in \mathcal{S}, t \in \mathcal{T} \setminus \{1\}.
+    w_{st} = u_{st} + v_{st} + w_{s(t-1)} -\sum_{s^\prime \in \mathcal{S}} y_{ss^\prime t}, \forall s \in \mathcal{S}, t \in \mathcal{T} \setminus \{1\}.
 \end{equation}
 
-For the servers, $H$ is the maximum amount of tasks that can be handled by a server in a time slot. Note that the required energy of a task is one unit, so we have the following constraint:
-\begin{equation}\label{c4}
-    \sum_{n \in \mathcal{N}}(x_{nst}+\sum_{s^\prime \in\mathcal{S}} y_{nss^\prime t} +z_{nst}) \leq H, \forall s \in \mathcal{S}, t \in \mathcal{T}.
-\end{equation}
-
-We use $I_{st}$ and $R_{st}$ to denote the carbon intensity of local grid $s$ and the amount of renewable energy from source $s$ in time slot $t$, respectively\footnote{The prediction data can be obtained from for example \cite{ElectricityMaps} and \cite{li2019renewable}, respectively.}. They are both normalized by $E$, and the unit of $I_{st}$ is g\ce{CO2}eq/$E$kWh that means the equivalent gram of \ce{CO2} generation per $E$ kilowatt-hour energy. For the energy from RE sources, we have the following constraint:
+We use $R_{st}$ to denote the amount of renewable energy\footnote{Renewable energy can be predicted, see \cite{li2019renewable}.} available from source $s$ in time slot $t$. The renewable energy is used for charging the local battery and supplying to the local server, so we have  
 \begin{equation}\label{c5}
-    z_{nst} + u_{st} \leq R_{st}, \forall s \in \mathcal{S}, t \in \mathcal{T}.
+    z_{st} + u_{st} \leq R_{st}, \forall s \in \mathcal{S}, t \in \mathcal{T}.
 \end{equation}
 
 \subsection{Carbon Footprint and Formulation} \label{subsec:CFA}
 
-In the system model, the CF occurs only in three processes related to the grids, including battery charging, task completing, and tasks transmission. Specifically,
+In the system model, the CF occurs only in three processes related to the grids, including battery charging, server consumption, and task offloading. Denote by $I_{st}$ the CI of local grid $s$ in time slot $t$. The three types of CF can be calculated as follows.
 \begin{enumerate}
-    \item {\em Tasks handling}: The total amount of CF from task handling in the network is expressed as
+    \item {\em Server consumption}: The CF will occur when a server consumes the energy from the local grid to complete task. The total amount of CF of that can be expressed as
     \begin{equation}\label{th}
-        Th(\boldsymbol{x}) = \sum_{t \in \mathcal{T}} \sum_{s\in \mathcal{S}} \sum_{n\in \mathcal{N}} I_{st}x_{nst}.
+        Sc(\boldsymbol{x}) = \sum_{t \in \mathcal{T}} \sum_{s\in \mathcal{S}} I_{st}x_{st}.
     \end{equation}
-    \item {\em Battery charging}: Similarly, the total amount of CF occurring in battery charging in the network can be calculated by
+    \item {\em Battery charging}: The total amount of CF in battery charging via the local grid can be calculated by
     \begin{equation}\label{bc}
         Bc(\boldsymbol{u}) = \sum_{t \in \mathcal{T}} \sum_{s\in \mathcal{S}} I_{st}u_{st}.
     \end{equation}
-    \item {\em Tasks transfer}: We use $\alpha_{s_n s}$ to represent the required energy for task $n$ transfer from its initial server $s_n$ to $s$ ($\alpha_{s_n s} = 0$ if $s_n = s$), so the total amount of CF from task transfer in the network is given by
+    \item {\em Task offloading}: In this paper, we consider the worst case of the CF in task offloading, i.e., we assume that the energy used for task offloading is all from the grid. We use $\alpha_{s_n s}$ to represent the required amount of the energy for transferring task $n$ from its initial server $s_n$ to $s$ ($\alpha_{s_n s} = 0$ if $s_n = s$). So the total amount of CF of task transfer in the network is given by
     \begin{align}\label{tt}
-        &Tt(\boldsymbol{x}, \boldsymbol{y}, \boldsymbol{z}) = \notag \\
-        & \sum_{n \in \mathcal{N}} \sum_{s \in \mathcal{S}} \alpha_{s_n s} \sum^{d_n}_{t = o_n} I_{st} ( x_{nst} + \sum_{s^\prime \in S_n}  y _{nss^\prime t} + z_{nst}).
+        Tt(\boldsymbol{\pi}) =  \sum_{n \in \mathcal{N}} \sum_{s \in \mathcal{S}_n}  \sum^{d_n}_{t = o_n} \alpha_{s_n s} I_{st}  \pi_{nst}.
     \end{align}
 \end{enumerate}
-In addition, there are losses in the energy transfer between the battery to the servers in other sites. We convert this loss to equivalent CF such that we can analyze the CF more explicitly. Furthermore, we denote the energy loss per unit of energy from the battery $s^\prime$ to server $s$ by $\beta_{s^\prime s}$ ($\beta_{s^\prime s} = 0$ if $s^\prime = s$). We suppose that local grid $s$ provides energy to make up for the loss, so the total amount of the equivalent CF with respect to loss is 
+In addition, there are losses in the energy transfer between the battery to the servers on other sites. We convert this loss to an equivalent CF such that we can analyze the CF more explicitly. Furthermore, we denote the loss per unit of energy from the battery $s^\prime$ to server $s$ by $\beta_{s^\prime s}$ ($\beta_{s^\prime s} = 0$ if $s^\prime = s$). We suppose that local grid $s$ provides energy to make up for the loss, so the total amount of the equivalent CF with respect to loss is 
 \begin{equation}\label{lo}
-    Lo(\boldsymbol{y}) = \sum_{n \in \mathcal{N}} \sum_{s \in \mathcal{S}} I_{st} \sum^{d_n}_{t = o_n}\sum_{s^\prime \in S_n}  \beta_{s^\prime s}  y _{nss^\prime t}.
+    Lo(\boldsymbol{y}) = \sum_{s \in \mathcal{S}}  \sum_{t \in \mathcal{T}}\sum_{s^\prime \in S_n}  \beta_{s^\prime s} I_{st} y _{ss^\prime t}.
 \end{equation}
 
 We consider minimizing the total CF in the edge computing network via offloading and scheduling the tasks, and charging and discharging the batteries. The CF minimization problem can be formulated by integer linear programming (ILP) as follows,
 \begin{subequations}\label{formulation}
     \begin{align}
-         \mathop{\min}_{\boldsymbol{x}, \boldsymbol{y}, \boldsymbol{z}, \boldsymbol{u}, \boldsymbol{v}, \boldsymbol{w}} \ &Th(\boldsymbol{x}) +  Bc(\boldsymbol{u}) + Tt(\boldsymbol{x}, \boldsymbol{y}, \boldsymbol{z}) + Lo(\boldsymbol{y}) \label{obj}\\
-         \text{s.t.} & \quad \eqref{c1} - \eqref{c5},\notag\\
-         & \quad x\text{-}\text{, } y\text{-}\text{, and } z\text{-variables} \in \{0,1\},\\
-         & \quad u\text{-}\text{, } v\text{-}\text{, and } w\text{-variables} \in \mathbb{N},
+         \mathop{\min}_{\boldsymbol{\pi}, \boldsymbol{x}, \boldsymbol{y}, \boldsymbol{z}, \boldsymbol{u}, \boldsymbol{v}, \boldsymbol{w}} \ &Sc(\boldsymbol{x}) +  Bc(\boldsymbol{u}) + Tt(\boldsymbol{\pi}) + Lo(\boldsymbol{y}) \label{obj}\\
+         \text{s.t.} & \quad \eqref{c0} - \eqref{c5},\notag\\
+         & \quad \pi\text{-variables} \in \{0,1\},
     \end{align}
 \end{subequations}
-where the objective function \eqref{obj} is the overall CF from the network.
+where the objective function \eqref{obj} is the overall CF of the network.
 
 \section{Problem Solving} 
 
-\input{fig-networkflow}
+% \input{fig-networkflow}
+% \input{fig-networkflow-2}
+\input{fig-networkflow-3}
 
-Although the CF minimization problem is formulated as ILP in \eqref{formulation}, it corresponds to a min cost flow problem that can be solved in polynomial time. We show the corresponding graph in Fig. \ref{fig:networkflow}. Generally speaking, the flows in the graph represent the energy transfers, and the costs of edges are the CF of the corresponding processes. The green and the yellow nodes are supply and demand nodes, respectively, and the sum of supply is equal to the sum of demand.
+Although the CF minimization problem is formulated as ILP in \eqref{formulation}, it corresponds to a minimum-cost flow problem that can be solved in polynomial time. We show the corresponding graph in Fig. \ref{fig:networkflow}.
 
-Let us introduce the detail of the graph. Note that the costs and capacities of edges default to zero and infinite if we do not specify them, respectively. The green and yellow nodes are supply and demand nodes, respectively, and the other colored nodes are all transshipment nodes. In addition, we use $(a\rightarrow b)$ to represent the directed edge from node $a$ to node $b$.
-
-\subsection{Perspective of a time slot}
-
-As we can see, except all the yellow nodes and the green node $\delta$, the nodes can be divided into $T$ parts by time slots. Looking into a part, there are three types of entities that are $\theta$-nodes, $(\kappa, \rho)$-pairs, and $(\lambda, \varepsilon)$-pairs:
+\subsection{Overall Introduction}
+A minimum-cost flow problem is an optimization problem to find the cheapest possible way of sending a certain amount of flow from supply node(s) to demand node(s) in a directed graph. In the graph, every arcs has two attributes: 1) the per-unit cost and 2) the capacity of sending flow across itself. The flows in the graph satisfy:
 \begin{enumerate}
-    \item Any green node $\theta^{t}_{s}$ is the supply node in the graph, and its quantity supplied represents how many units of energy RE source $s$ can provide in time slot $t$, i.e., $R_{st}$. Two flows from node $\theta^{t}_{s}$ to nodes $\lambda^{t}_{s}$ and $\kappa^{t}_{s}$ represent the variables $z_{st}$ and $u_{st}$, respectively. By the definition of networkflow graph, these two flows follow constraint \eqref{c5}. Note that node $\theta^{t}_{s}$ also connects to yellow demand node $\mu$, and node $\mu$ is used for receiving the surplus flows (i.e., surplus energy) in the graph to guarantee the feasibility of the min cost flow problem.
-    \item In any red pair $(\kappa^{t}_{s}, \rho^{t}_{s})$, both the two nodes are transshipment nodes. The capacity of edge $(\kappa^{t}_{s}\rightarrow \rho^{t}_{s})$ is set to be the capacity of battery $s$, i.e., $L$. The flows to node $\kappa^{t}_{s}$ from nodes $\delta$, $\theta^{t}_{s}$, and $\rho^{t-1}_{s}$ are equivalent to variables $u_{st}$, $v_{st}$, and $w_{s(t-1)}$, respectively, and they follow constraint \eqref{c2} by the definition of networkflow graph.
-    \item Any blue pair $(\lambda^{t}_{s}, \varepsilon^{t}_{s})$ represents server $s$ in time slot $t$, the two nodes of which are both transshipment nodes. The capacity of edge $(\lambda^{t}_{s}\rightarrow\varepsilon^{t}_{s})$ is the amount of energy required when server $s$ fully handles tasks in time slot $t$, i.e., $H$. Similarly, the flows to $\lambda^{t}_{s}$ from nodes $\delta$, $\rho^{t}_{s^\prime}$, and $\theta^{t}_{s}$ represent variables $x_{nst}$, $y_{nss^\prime t}$ ($\forall s^\prime \in \mathcal{S}$), and $z_{nst}$, and these flows follow constraint \eqref{c4}. Note that the flow through edge $(\rho^{t}_{s^\prime}\rightarrow\lambda^{t}_{s})$ represents that battery $s^\prime$ provides energy to server $s$ in time slot $t$, so the cost of the edge is $\beta_{s^\prime s} I_{st}$, and it accounts for the losses in tasks transfer. Clearly, the total flow cost in these edges equals to \eqref{lo}.
+    \item Balance constraint: the sum of the flow through arcs directed toward a node plus that node's supply, if any, equals the sum of the flow through arcs directed away from that node plus that node's demand, if any. 
+    \item Capacity constraint: The flow on every arc of a flow network is no more than the arc's capacity.
 \end{enumerate}
 
-\subsection{Perspective of two neighbor time slots}
-Between any two neighbor time slots $t$ and $t+1$, there are $S$ edges, i.e., $(\rho^{t}_{s}\rightarrow\kappa^{t+1}_{s})$ $\forall s\in \mathcal{S}$. The edges mean the evolution of the batteries between time slots $t$ and $t+1$. According to flow balance constraint in networkflow graph, node $\kappa^{t+1}_{s}$ will receive flows that are from node $\rho^{t}_{s}$ except these to node $\lambda^{t}_{s}$, i.e., this flow balance constraint derives constraint \eqref{c3}.
+In our graph shown in Fig \ref{fig:networkflow}, the green and the yellow nodes in are supply and demand nodes, respectively, and the other colored nodes are all transshipment nodes that neither supply nor demand. Overall, green node $\theta$, red $(\kappa, \rho)$-pairs, blue $(\lambda, \varepsilon)$-pairs, and yellow $\tau$-nodes represent the grid, batteries, servers, and tasks, respectively. The flows in the graph can be regarded as energy transfer, and the per-unit costs of arcs are used for accounting for the CF.
 
-\subsection{Perspective of the grids}
+Note that the per-unit costs and capacities of arcs default to zero and infinite if we do not specify them, respectively. we use $(a\rightarrow b)$ to represent the arc from node $a$ to node $b$.
 
-We also can see that there are two types of edges from supply node $\delta$:
+\subsection{The Entities in a Time Slots} \label{sub-A}
+
+There are $T$ parts named by Time Slot $t$ $(t\in \mathcal{T})$ in the graph. Looking into a part of them, there are three types of entities that are $\theta$-nodes, $(\kappa, \rho)$-pairs, and $(\lambda, \varepsilon)$-pairs:
 \begin{enumerate}
-    \item Flows can be sent through the edge $(\delta \rightarrow\kappa^{t}_{s})$, and this represents local grid $s$ charge battery $s$ in time slot $t$. Clearly, its cost is $I_{st}$ that accounts for CF in battery charging, and the total flow cost in these edges is the same as \eqref{bc}.
-    \item We use flows through edge $(\delta \rightarrow \lambda^{t}_{s})$ represent local grid $s$ provide energy to server $s$ in time slot $t$, so the cost of edge $(\delta \rightarrow \lambda^{t}_{s})$ is set to be $I_{st}$. The cost is used for accounting for CF in task handling, and the sum of flow cost in these edges is equivalent to \eqref{th}.
+    \item Green node $\theta^{t}_{s}$ represents renewable source $s$ in time slot $t$. Its quantity supplied is set to be $R_{st}$, i.e., the amount of energy available from source $s$ in time slot $t$. The meaning of the two flows in arcs $(\theta^{t}_{s}\rightarrow \lambda^{t}_{s})$ and $(\theta^{t}_{s}\rightarrow \kappa^{t}_{s})$ is the same as that of the variables $z_{st}$ and $u_{st}$, respectively. By graph construction, the two flows follow constraint \eqref{c5}. Note that node $\theta^{t}_{s}$ also connects to yellow demand node $\mu$ used for receiving the surplus flows (i.e., surplus energy) in the graph to guarantee the feasibility of the minimum-cost flow problem.
+    \item A red pair $(\kappa^{t}_{s}, \rho^{t}_{s})$ represents battery $s$ in time slot $t$. The capacity of arc $(\kappa^{t}_{s}\rightarrow \rho^{t}_{s})$ is set to be the capacity of battery $s$, i.e., $L$. The flows in arcs $(\delta \rightarrow \kappa^{t}_{s})$, $(\theta^{t}_{s} \rightarrow \kappa^{t}_{s})$, and $(\rho^{t-1}_{s}\rightarrow \kappa^{t}_{s})$ are equivalent to variables $u_{st}$, $v_{st}$, and $w_{s(t-1)}$, respectively, and they follow constraint \eqref{c2} by their flow balance constraint.
+    \item A blue pair $(\lambda^{t}_{s}, \varepsilon^{t}_{s})$ represents server $s$ in time slot $t$. The flows in arcs $(\delta \rightarrow \lambda^{t}_{s})$, $(\rho^{t}_{s^\prime} \rightarrow \lambda^{t}_{s})$, and $(\theta^{t}_{s} \rightarrow \lambda^{t}_{s} )$ represent variables $x_{nst}$, $y_{nss^\prime t}$, and $z_{nst}$, respectively. The flows are subject to constraint \eqref{c1} by flow balance constraint. In addition, the capacity of arc $(\lambda^{t}_{s}\rightarrow\varepsilon^{t}_{s})$ is set to be server capacity $H$, so the corresponding capacity constraint implies constraint \eqref{c4}. Note that the flow through arc $(\rho^{t}_{s^\prime}\rightarrow\lambda^{t}_{s})$ represents that battery $s^\prime$ provides energy to server $s$ in time slot $t$, so the per-unit cost of the arc is set to be $\beta_{s^\prime s} I_{st}$, and it accounts for the losses in task offloading. Clearly, the total flow cost in these arcs equals to \eqref{lo}.
 \end{enumerate}
-There is also an edge from node $\delta$ to node $\mu$ that is used for receiving the surplus flows from the grid. The number of node $\delta$'s supplied flows is large enough, e.g., $N$. 
 
-\subsection{Perspective of the tasks}
+\subsection{Battery Evolution}
+Between any two neighboring parts Time slots $t$ and $t+1$ in the graph, there are $S$ arcs, i.e., $(\rho^{t}_{s}\rightarrow\kappa^{t+1}_{s})$ $\forall s\in \mathcal{S}$. The arcs mean the evolution of the batteries between time slots $t$ and $t+1$. According to flow balance constraint in networkflow graph, node $\kappa^{t+1}_{s}$ will receive flows that are from node $\rho^{t}_{s}$ except those to node $\lambda^{t}_{s}$, i.e., this flow balance constraint derives constraint \eqref{c3}.
 
-Let us look into the part named Tasks in the graph where yellow demand node $\tau_n$ represents task $n$. The quantity demanded of any node $\tau_n$ is one. We set the edges between $\varepsilon$-nodes and $\tau$-nodes by the information of all the tasks' tuples. Specifically, any edge from blue node $\varepsilon^{t}_{s}$ to yellow node $\tau_{n}$ represents that server $s$ can handle task $n$ in time slot $t$ ($o_n \leq t \leq d_n$). According to the flow balance constraint, the sum of the flows from nodes $\delta$, $\rho^{t}_{s^\prime}$ ($\forall s^\prime \in \mathcal{S}$), and $\theta^{t}_{s}$ is one. So, the variables that these flows are equivalent to constraint \eqref{c1}.
+\subsection{The Grids}
 
-Regarding the cost of the edges, we use the cost of the edges to account for the CF in task transfer. Note that we have used the cost of edge $(\delta\rightarrow\lambda^{t}_{s})$ to account for the CF of task $n$ handled by server $s$ in time slot $t$. Therefore, the cost of edge $(\varepsilon^{t}_{s}\rightarrow\tau_n)$ is $\alpha_{s_{n}s}I_{s_{n}t}$. Obviously, the sum of flow cost in these edges is equivalent to \eqref{tt}.
+The multiple local grids are merged to be a green node $\delta$ but we can easily identify the different grids by the arcs to the nodes corresponding to different batteries and servers:
+\begin{enumerate}
+    \item Flows can be sent through arc $(\delta \rightarrow\kappa^{t}_{s})$, and this represents that local grid $s$ charge battery $s$ in time slot $t$. Clearly, its per-unit cost is $I_{st}$ that accounts for CF in battery charging, and the total flow cost in these arcs is the same as \eqref{bc}.
+    \item We use the flow through arc $(\delta \rightarrow \lambda^{t}_{s})$ to represent that local grid $s$ provides energy to server $s$ in time slot $t$, so the cost of arc $(\delta \rightarrow \lambda^{t}_{s})$ is set to be $I_{st}$. The per-unit cost is used for accounting for CF in task completion, and the sum of flow cost in these arcs is equivalent to \eqref{th}.
+\end{enumerate}
+Another arc $(\delta \rightarrow \mu)$ is used for sending the surplus flows from the grid. The quantity supplied of node $\delta$ is set to be large enough, e.g., $N$. 
 
-\subsection{Algorithms}
+\subsection{The Tasks} \label{sub-D}
 
-We have introduced all the nodes and edges in the graph, and we have shown all the constraints of Problem \eqref{formulation} have corresponding constraints in the min cost flow problem. In addition, by setting the costs of different edges, the objective function of the min cost flow problem is equivalent to \eqref{obj}. The min cost flow problem can be solved by existing algorithms in polynomial time \cite{10.5555/137406}, for example, the network simplex algorithm.
+In the part named by Task, a yellow demand node $\tau_n$ represents task $n$. The quantity demanded of any node $\tau_n$ is one. The arcs between $\varepsilon$-nodes and $\tau$-nodes are constructed by the information of all the tasks' tuples. Specifically, arc $(\varepsilon^{t}_{s}\rightarrow\tau_{n})$ represents that server $s$ can complete task $n$ in time slot $t$ ($o_n \leq t \leq d_n$). Obviously, the flow through this arc represent variable $\pi_{nst}$, and the balance constraint for the arc are equivalent to constraint \eqref{c0}.
+
+Regarding the per-unit cost of the arcs, we use them to account for the CF in task offloading. Therefore, the per-unit cost of arc $(\varepsilon^{t}_{s}\rightarrow\tau_n)$ is $\alpha_{s_{n}s}I_{s_{n}t}$, and the sum of flow cost in these arcs is equivalent to \eqref{tt}.
+
+\subsection{Algorithms and Complexity}
+
+A minimum-cost flow problem can be solved to the optimum by existing algorithms in polynomial time \cite{10.5555/137406}. So, we have the following theorem with respect to the complexity of our optimization approach.
+
+\begin{theorem}
+CF minimization problem \eqref{formulation} can be solved in polynomial time.
+\end{theorem}
+\begin{proof}
+The optimization approach to problem \eqref{formulation} is that 
+\begin{enumerate}
+    \item we construct the corresponding graph by the details in Section \ref{sub-A} - \ref{sub-D};
+    \item we obtain the corresponding solution to problem \eqref{formulation} by, for example, the network simplex algorithm. 
+\end{enumerate}
+Obviously, the corresponding graph have in total $\mathcal{O}(ST + N)$ nodes and $\mathcal{O}(S^2 +ST + NST)$ arcs, so the graph constructing can be completed in polynomial time. In addition, the minimum-cost flow problem can be solved in polynomial time. Hence the conclusion.
+\end{proof}
+
+
+
+
+
 
 \section{Performance Evaluation}
 
-
-In this section, we use one-day CI data of Sweden, Germany, and Poland from \cite{ElectricityMaps} to evaluate the performance of our proposed method. In our simulation, the length of a time slot is an hour. We assume that 7 am to 7 pm are daytime, and the other hours are night. The REs in the daytime for the time slots follow a binomial distribution $B(5, 0.5)$, and at the night they are set to be zero. In addition, all the tasks' $o_{n}$, $d_n$ ($o_n \leq d_n$), and $s_n$ all follow a discrete uniform distribution. In addition, we set $\mathcal{S}_n = \mathcal{S}$ $\forall n \in \mathcal{N}$, i.e., all the tasks can be offloaded among all the servers. Other simulation parameters are listed in Table \ref{tab:parameters}. Note that the values of CF in our results are all normalized by $E$. 
+In this section, we use a 24-hour CI data set of Sweden, Germany, and Poland from \cite{ElectricityMaps}, a part of which is shown in \ref{tab:data}, for performance evaluation. In our simulation, the length of a time slot is an hour. The amount of renewable energy follows a binomial distribution $B(5, 0.5)$ during daytime (7 am to 7 pm), and is zero otherwise. All the tasks' $o_{n}$, $d_n$ ($o_n \leq d_n$), and $s_n$ all follow a discrete uniform distribution. In addition, we set $\mathcal{S}_n = \mathcal{S}$ $\forall n \in \mathcal{N}$, i.e., a task can be offloaded to any server. Other simulation parameters are listed in Table \ref{tab:parameters}. Note that the values of CF in our results are all normalized by $E$. 
 
 \begin{table}[h]
-    \caption{\label{tab:parameters}Simulation Parameters}
+    \caption{\label{tab:parameters}Simulation Parameters.}
     \begin{center}
         \begin{threeparttable}[b]
             \begin{tabular}{*{2}{lr}}
@@ -301,11 +378,11 @@ In this section, we use one-day CI data of Sweden, Germany, and Poland from \cit
                 \midrule
                 {\bf Parameter} & {\bf Value}\\
                 \midrule
-                 The number of time slots $T$ & $24$ \\
-                 The number of servers $S$ & $3$\\
-                 The number of tasks $N$ & $100$\\
-                 The energy for one task transfer $\alpha$ & 0.1\\
-                 Loss for one unit of energy transfer $\beta$ & $0.2$\\
+                 The number of time slots ($T$) & $24$ \\
+                 The number of servers ($S$) & $3$\\
+                 The number of tasks ($N$) & $100$\\
+                 The energy for transferring one task ($\alpha$) & $0.1$\\
+                 Loss for transferring one energy unit ($\beta$) & $0.2$\\
                 \bottomrule
             \end{tabular}
         \end{threeparttable}
@@ -314,28 +391,29 @@ In this section, we use one-day CI data of Sweden, Germany, and Poland from \cit
 
 \input{result1}
 
-Fig. \ref{fig:result1} shows the performance results of our proposed method for various battery capacities $L$ and server capacities $H$. As we can see that there is a drastic reduction (almost a half) of CF when battery capacity becomes $5$ from $0$ for any server capacity. This is because we can schedule and share low-CF energy among the servers via battery and BMS. When battery capacity $L$ is greater than $15$, the total CF is hardly changed because the batteries can already store all the energy required by all the tasks when $L = 15$. In addition, when the server capacity increases, the total CF decreases as more tasks can be offloaded to those servers in low-CI areas.
+Fig. \ref{fig:result1} shows the performance results of our proposed scheme with respect to battery capacity $L$ and server capacity $H$. As we can see, there is a dramatic reduction of CF when the battery capacity goes from zero (i.e., no battery) to $5$ units. Thus the importance of battery (and BMS) for cresting low-CF energy buffer is apparent. When the battery capacity $L$ is greater than $15$, the total CF is hardly improved because this capacity level can store all the energy required by all the tasks. In addition, when the server capacity increases, the total CF decreases as more tasks can be offloaded to servers in low-CI spaces.
 
-We are wondering about the impact of task offloading and energy sharing via BMS for the total CF, so we compare the performance of the four schemes including our method and three benchmark schemes:
+We are curious about the impact of task offloading and energy sharing, respectively, hence we compare the performance of four schemes:
 \begin{itemize}
-    \item S1: The first scheme that our method considers both task offloading and energy sharing via BMS in the network.
-    \item S2: This benchmark scheme enables task offloading but the BMS in the network is disabled, i.e., battery can only provide energy to the server in the same site.
-    \item S3: This benchmark scheme supports energy sharing among the servers via BMS but the tasks can not be offloaded among the servers.
-    \item S4: Task offloading and energy sharing are both disabled in the third benchmark scheme.
+    \item S1: The is the proposed scheme considering both task offloading and energy sharing via BMS in the network.
+    \item S2: This scheme allows task offloading but the BMS is disabled, i.e., a battery can only provide energy to the local server.
+    \item S3: This is the opposite to S2, namely energy sharing is enabled, but the tasks can not be offloaded among the servers.
+    \item S4: In the last scheme, task offloading and energy sharing are both disabled; this corresponds to the most basic benchmark for comparison.
 \end{itemize}
-In the simulation, we obtain the performances of the four schemes by solving the corresponding min cost flow problems. In the graphs, we change some edges $(\varepsilon \rightarrow \tau)$ and edges $(\rho \rightarrow \lambda)$ to enable/disable the functions of task offloading and energy sharing, respectively. Figs. \ref{fig:result2} and \ref{fig:result3} show the performance results for various batter capacities $L$ and server capacities $H$, in which we use w/ and w/o to represent with and without, respectively. Overall, compared with the conventional network, task offloading and energy sharing can help significantly reduce total CF which is $83.3\%$ at most when $L = 5$ and $H = 16$.
+In the simulation, we obtain the performance of the four schemes by solving the corresponding minimum-cost flow problems. Figs. \ref{fig:result2} and \ref{fig:result3} show the performance results with respect to batter capacity $L$ and server capacity $H$, where we use w/ and w/o to represent with and without, respectively. Overall, compared with the conventional network (scheme S4), task offloading and energy sharing can help significantly reduce the total CF up to $83.3\%$ by the observation in Fig.\ref{fig:result3} when $L = 5$ and $H = 16$.
 
 \input{result2}
 
 \input{result3}
 
-In Fig. \ref{fig:result2}, the comparison between S1 and S2 reveals that, if the batteries are low-capacity, the BMS is helpless because typically less surplus energy in the batteries can be provided. This conclusion can also be verified by the performance of S3 and S4 when $L = 1$. In addition, by the trends of S2 and S3, we can draw a conclusion that task offloading is in fact equivalent to energy sharing if battery capacity is high enough, for example, $L = 10$. 
+In Fig. \ref{fig:result2}, the comparison between S1 and S2 reveals that, when the batteries are low-capacitied and high-capacitied, the energy sharing is useless. When the low case, this is because there is less surplus energy for sharing when the low case. For the high case, the tasks can be offloaded to servers with the local battery has stored enough low-CI energy. A similar conclusion from the results of S1 and S2 in Fig. \ref{fig:result3} is that energy sharing is not crucial when server capacity is large enough. In the case of high-capacitied servers, the tasks can offloaded as much as possible to low-CI space such that we do not need energy sharing. 
 
-Even we can derive that considering either task offloading or energy sharing is equivalent to considering both if the capacities of the batteries and the servers are both high enough by the performances of S1 and S2 in Fig. \ref{fig:result3}. In addition, the performance of S1 and S2 in Fig. \ref{fig:result3} shows that the BMS can help reduce significantly the total CF when the capacities of the batteries and the servers are both moderate size, for example, $L = 5$ and $H = 10$. 
+In addition, the curves of S2 and S3 in Fig. \ref{fig:result2} shows that task offloading and energy sharing almost give the same effect when battery capacity is high enough. This can be expected as the two operations that offloading a task to low-CI space and obtaining energy from low-CI space are in fact similar. So, we only need to consider one of the two operations in the case of high-capacitied batteries and servers.
+
+The performance of S3 and S4 in Fig. \ref{fig:result3} hardly change with increasing server capacity $H$, and this observation shows that considering only task scheduling without task offloading leads to a limited reduction of CF. This is because the difference of CI in temporal dimension is typically not so large as that in spatial dimension. In addition, the performance of S1 and S2 in Fig. \ref{fig:result3} shows that energy sharing can help reduce significantly the total CF when the capacities of the batteries and the servers are both moderate size, for example, $L = 5$ and $H = 10$. 
 
 \section{Conclusion} \label{Sec:conclusion}
-We have considered a CF minimization problem for an edge computing network with renewable energy and batteries in which the tasks and the energy of the batteries can be transferred among the servers. Although the problem is formulated as an integer linear programming, we provide a networkflow- based method that can solve the problem to the optimum in polynomial time. The numerical results show the significant CF reduction obtained by our method, and also demonstrate the importance of task offloading and energy sharing for reducing CF in the network. 
-
+We have considered a CF minimization problem for an edge computing network with renewable energy and energy sharing by joint task offloading and energy sharing. We formulated the problem as an integer linear programming model. Making the use of the structure of the problem, we have proposed a graph-based reformulation that can help solve the problem to the optimum in polynomial time. The numerical results demonstrated the potential of the use of spatial and temporal information of CI for reducing the CF in the network, and joint task offloading and energy sharing can help significantly reduce CF. Moreover, our observation have found that we can achieve the potential if only improve the energy storage or computing capability instead of both.
 
 \bibliographystyle{IEEEtran}
 \bibliography{mybibtex}
