@@ -122,8 +122,10 @@ y,x,myvalue
 \pgfplotsset{set layers}
 \begin{axis}[% from section 4.6.4 of the pgfplotsmanual
         view={120}{40},
+        % width=0.5 * \textwidth,
+        % height=0.4375 * \textwidth,
         width=0.5 * \textwidth,
-        height=0.4375 * \textwidth,
+        height=0.35 * \textwidth,
         z buffer=none,
         xmin=6.5, xmax=13,
         ymin=-2, ymax=30,
@@ -183,5 +185,5 @@ mark=cube*,mark size=5,opacity=1]
 \makeatother
 \end{tikzpicture}
 	\end{center}
-	\caption{The 3D histogram shows the total CF under varying batter capacity $L$ and server capacity $H$.}\label{fig:result1}
+	\caption{The 3D plot shows the total CF with respect to batter capacity $L$ and server capacity $H$.}\label{fig:result1}
 \end{figure}
