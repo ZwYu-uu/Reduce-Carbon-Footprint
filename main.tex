@@ -38,7 +38,7 @@
 \usepackage{tikz,pgfplots,filecontents}
 \usepackage{rotating}
 \usetikzlibrary{spy} %
-\pgfplotsset{width=8.6cm, height=6.5cm, compat=1.9}
+\pgfplotsset{width=8.6cm, height=6cm, compat=1.9}
 
 \usepackage{physics}
 \usepackage{amsmath}
@@ -368,7 +368,7 @@ The per-unit cost of arc $(\varepsilon^{t}_{s}\rightarrow\tau_n)$ is set to be $
 
 \subsection{Algorithm and Complexity}
 
-With the graph constructed, the minimum-cost flow problem can be solved to the optimum by the network simplex algorithm\cite{10.5555/137406}, and we can obtain the optimal solution to \eqref{formulation} by the corresponding flows. Note that the potential difficulty of \eqref{formulation} is that $\boldsymbol{\pi}$ is binary. Although the flows are not required to be integer, the integrality theorem of minimum-cost flow problem guarantees that there always exists a integer optimal flow \cite[Theorem 11.5]{10.5555/137406}, and the network simplex algorithm permits us to obtain integer optimal solutions. The demand of a task node is one in the graph, and thus a task will not be split between more than one server, i.e., $\boldsymbol{\pi} \in \{0,1\}$, in our optimal solution.
+With the graph constructed, the minimum-cost flow problem can be solved to the optimum by the network simplex algorithm\cite{10.5555/137406}, and we can obtain the optimal solution to \eqref{formulation} by the corresponding flows. Note that the potential difficulty of \eqref{formulation} is that $\boldsymbol{\pi}$ is binary. Although the flows are not required to be integer, the integrality theorem of minimum-cost flow problem guarantees that there always exists an integer optimal solution \cite[Theorem 11.5]{10.5555/137406}, and the network simplex algorithm permits us to obtain integer optimal solutions. Given an integer optimal solution, for each task node, only one unit of flow is routed from some $\varepsilon$-node as the demand of a task node is one, i.e., a task will not be split between more than one server.
 
 In addition, We have the following theorem with respect to the complexity of our optimization approach.
 
